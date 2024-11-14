@@ -1,0 +1,7 @@
+Getting 100% in test coveragemeans that all the lines of the code in the
+applicationhas been executed at least once during testing. Also, it does
+not mean all the edge cases and all possible scenarios are covered and
+tested. It is important to write meaningful tests that cover different 
+branches, error handling, and edge cases to ensure the robustness of your 
+application. 100% coverage is a good, but the quality and relevance of the 
+tests are also equally important.
