@@ -1,5 +1,6 @@
 import Author from '../models/author'; // Adjust the import to your Author model path
-import { getAuthorList } from '../pages/authors'; // Adjust the import to your function
+import { getAuthorList, showAllAuthors } from '../pages/authors'; // Adjust the import to your function
+import { Response } from 'express'; // Import Response type from express
 
 describe('getAuthorList', () => {
     afterEach(() => {
@@ -111,5 +112,56 @@ describe('getAuthorList', () => {
 
         // Assert: Verify the result is an empty array
         expect(result).toEqual([]);
+    });
+
+    describe('showAllAuthors', () => {
+        let res: Partial<Response>;
+    
+        beforeEach(() => {
+            res = {
+                send: jest.fn(),
+            };
+        });
+    
+        afterEach(() => {
+            jest.resetAllMocks();
+        });
+    
+        it('should send the authors list when data is available', async () => {
+            // Arrange
+            const mockAuthors = ['Austen, Jane : 1775 - 1817', 'Ghosh, Amitav : 1835 - 1910'];
+            const getAuthorListMock = jest.spyOn(require('../pages/authors'), 'getAuthorList').mockResolvedValue(mockAuthors);
+    
+            // Act
+            await showAllAuthors(res as Response);
+    
+            // Assert
+            expect(getAuthorListMock).toHaveBeenCalled();
+            expect(res.send).toHaveBeenCalledWith(mockAuthors);
+        }); 
+    
+        it('should send "No authors found" when data is empty', async () => {
+            // Arrange
+            const getAuthorListMock = jest.spyOn(require('../pages/authors'), 'getAuthorList').mockResolvedValue([]);
+    
+            // Act
+            await showAllAuthors(res as Response);
+    
+            // Assert
+            expect(getAuthorListMock).toHaveBeenCalled();
+            expect(res.send).toHaveBeenCalledWith('No authors found');
+        });
+    
+        it('should handle errors and send "No authors found"', async () => {
+            // Arrange
+            const getAuthorListMock = jest.spyOn(require('../pages/authors'), 'getAuthorList').mockRejectedValue(new Error('Database error'));
+    
+            // Act
+            await showAllAuthors(res as Response);
+    
+            // Assert
+            expect(getAuthorListMock).toHaveBeenCalled();
+            expect(res.send).toHaveBeenCalledWith('No authors found');
+        });
     });
 });
